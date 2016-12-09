@@ -1,4 +1,4 @@
-package com.zhy.spider.bean;
+package com.noteshare.spider.bean;
 
 public class LinkTypeData
 {

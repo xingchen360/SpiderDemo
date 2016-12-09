@@ -1,11 +1,8 @@
-package com.zhy.spider.core;
+package com.noteshare.spider.core;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import javax.swing.plaf.TextUI;
 
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
@@ -13,10 +10,10 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.zhy.spider.bean.LinkTypeData;
-import com.zhy.spider.rule.Rule;
-import com.zhy.spider.rule.RuleException;
-import com.zhy.spider.util.TextUtil;
+import com.noteshare.spider.bean.LinkTypeData;
+import com.noteshare.spider.rule.Rule;
+import com.noteshare.spider.rule.RuleException;
+import com.noteshare.spider.util.TextUtil;
 
 /**
  * 
@@ -31,10 +28,8 @@ public class ExtractService
 	 */
 	public static List<LinkTypeData> extract(Rule rule)
 	{
-
 		// 进行对rule的必要校验
 		validateRule(rule);
-
 		List<LinkTypeData> datas = new ArrayList<LinkTypeData>();
 		LinkTypeData data = null;
 		try
@@ -48,10 +43,8 @@ public class ExtractService
 			String resultTagName = rule.getResultTagName();
 			int type = rule.getType();
 			int requestType = rule.getRequestMoethod();
-
 			Connection conn = Jsoup.connect(url);
 			// 设置查询参数
-
 			if (params != null)
 			{
 				for (int i = 0; i < params.length; i++)
@@ -93,7 +86,6 @@ public class ExtractService
 					results = doc.getElementsByTag("body");
 				}
 			}
-
 			for (Element result : results)
 			{
 				Elements links = result.getElementsByTag("a");
@@ -142,8 +134,5 @@ public class ExtractService
 				throw new RuleException("参数的键值对个数不匹配！");
 			}
 		}
-
 	}
-
-
 }

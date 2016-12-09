@@ -1,4 +1,4 @@
-package com.zhy.spider.util;
+package com.noteshare.spider.util;
 
 public class TextUtil
 {

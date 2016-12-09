@@ -1,11 +1,5 @@
-package com.zhy.spider.rule;
+package com.noteshare.spider.rule;
 
-/**
- * 规则类
- * 
- * @author zhy
- * 
- */
 public class Rule
 {
 	/**

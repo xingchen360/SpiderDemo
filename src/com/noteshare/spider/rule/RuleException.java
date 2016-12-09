@@ -1,7 +1,17 @@
-package com.zhy.spider.rule;
+package com.noteshare.spider.rule;
 
 public class RuleException extends RuntimeException
 {
+
+	/** 
+	 * @Title: RuleException.java 
+	 * @Package com.zhy.spider.rule 
+	 * @Description: TODO
+	 * @author 陈海新
+	 * @date 2016年12月9日 上午10:22:36 
+	 * @version V1.0 
+	 */ 
+	private static final long serialVersionUID = 1L;
 
 	public RuleException()
 	{

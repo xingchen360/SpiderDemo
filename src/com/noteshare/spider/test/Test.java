@@ -1,24 +1,35 @@
-package com.zhy.spider.test;
+package com.noteshare.spider.test;
 
 import java.util.List;
 
-import com.zhy.spider.bean.LinkTypeData;
-import com.zhy.spider.core.ExtractService;
-import com.zhy.spider.rule.Rule;
+import org.junit.Ignore;
+
+import com.noteshare.spider.bean.LinkTypeData;
+import com.noteshare.spider.core.ExtractService;
+import com.noteshare.spider.rule.Rule;
 
 public class Test
 {
+	@org.junit.Test
+	public void getDatasByClass1()
+	{
+		Rule rule = new Rule("http://itnoteshare.com/user/星辰/validateNickname.htm",null, null,"cont_right", Rule.CLASS, Rule.POST);
+		List<LinkTypeData> extracts = ExtractService.extract(rule);
+		printf(extracts);
+	}
+	@Ignore
 	@org.junit.Test
 	public void getDatasByClass()
 	{
 		Rule rule = new Rule(
 				"http://www1.sxcredit.gov.cn/public/infocomquery.do?method=publicIndexQuery",
-		new String[] { "query.enterprisename","query.registationnumber" }, new String[] { "兴网","" },
+				new String[] { "query.enterprisename","query.registationnumber" }, new String[] { "子长县乔森照明门市","" },
 				"cont_right", Rule.CLASS, Rule.POST);
 		List<LinkTypeData> extracts = ExtractService.extract(rule);
 		printf(extracts);
 	}
-
+	
+	@Ignore
 	@org.junit.Test
 	public void getDatasByCssQuery()
 	{
