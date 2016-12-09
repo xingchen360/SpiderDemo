@@ -48,14 +48,17 @@ public class TestSpiderUtil {
 		WebClient wc = new WebClient(BrowserVersion.CHROME);
 	    wc.getOptions().setUseInsecureSSL(true);  
 	    wc.getOptions().setJavaScriptEnabled(true); // 启用JS解释器，默认为true  
-	    wc.getOptions().setCssEnabled(true); // 禁用css支持  
+	    wc.getOptions().setCssEnabled(false); // 禁用css支持  
 	    wc.getOptions().setThrowExceptionOnScriptError(false); // js运行错误时，是否抛出异常  
 	    wc.getOptions().setTimeout(100000); // 设置连接超时时间 ，这里是10S。如果为0，则无限期等待  
 	    wc.getOptions().setDoNotTrackEnabled(false);  
-	    HtmlPage page = wc.getPage("http://www.weather.com.cn/weather1d/101190202.shtml");  
-	    List<HtmlDivision> articleDivs = (List<HtmlDivision>)page.getByXPath("//*[@id=\"today\"]/div[1]/div/div[3]/span");
-	  //*[@id="today"]/div[1]/div/div[3]/span
-	    System.out.println(articleDivs);
+	    HtmlPage page = wc.getPage("http://www.weather.com.cn/weather1d/101190202.shtml");
+	    ////*[@id="today"]
+		List<HtmlDivision> todayDivs = (List<HtmlDivision>)page.getByXPath("//*[@id=\"today\"]");
+	    System.out.println(todayDivs);
+	    System.out.println(todayDivs.get(0).asXml());
+	    System.out.println(todayDivs.get(0).asText());
+	    System.out.println(todayDivs.get(0).getTextContent());
 	}
 }
 
