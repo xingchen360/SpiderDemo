@@ -22,11 +22,14 @@ public class SpiderUtil {
 	 * @return 返回html文档对象
 	 * @throws IOException
 	 */
-	public static Document getDocument(RequestParams resParams) throws IOException {
+	public static Document getDocument(RequestParams resParams,Map<String,String> headerMap) throws IOException {
 		//判断请求路径是否合法
 		boolean bool = Validation.validateRule(resParams.getLink());
 		if(bool){
 			Connection conn = Jsoup.connect(resParams.getLink());
+			if(null != headerMap && !headerMap.isEmpty()){
+				conn.headers(headerMap);
+			}
 			Map<String,String> resMap = resParams.getParamMap();
 			//添加请求参数
 			if(null != resMap && !resMap.isEmpty()){
