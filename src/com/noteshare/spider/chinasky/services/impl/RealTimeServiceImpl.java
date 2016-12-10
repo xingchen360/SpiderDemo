@@ -78,13 +78,18 @@ public class RealTimeServiceImpl implements RealTimeService{
 			//			白天温度
 			//			晚上温度
 			Element temElement = element.getElementsByClass("tem").get(0);
-			String daytimeTem = temElement.getElementsByTag("span").get(0).text();
-			String nightTem = temElement.getElementsByTag("i").get(0).text();
+			String daytimeTem = "";
+			String nightTem = "";
+			//晚上时分只有一个值
+			try{daytimeTem = temElement.getElementsByTag("span").get(0).text();}catch(Exception e){}
+			try{nightTem = temElement.getElementsByTag("i").get(0).text();}catch(Exception e){}
 			//			白天风向
 			//			晚上风向
 			Element winElement = element.getElementsByClass("win").get(0);
-			String daytimeWin = winElement.getElementsByTag("span").get(0).attr("title");
-			String nightWin = winElement.getElementsByTag("span").get(1).attr("title");
+			String daytimeWin = "";
+			try{daytimeWin = winElement.getElementsByTag("span").get(0).attr("title");}catch(Exception e){}
+			String nightWin = "";
+			try{nightWin = winElement.getElementsByTag("span").get(1).attr("title");}catch(Exception e){}
 			//			风力
 			String winPower = winElement.getElementsByTag("i").get(0).text();
 			//			采集时间
