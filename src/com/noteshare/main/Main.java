@@ -1,74 +1,139 @@
 package com.noteshare.main;
 
+import java.awt.BorderLayout;
+import java.awt.FlowLayout;
+import java.awt.Label;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.HashMap;
-import java.util.Map;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Timer;
 
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
 
-import org.jsoup.nodes.Document;
+/**
+ * @ClassName			: Main 
+ * @Description			: 程序入口类
+ * @author 				： NoteShare 
+ * @date 				： 2016年12月11日 下午10:15:10
+ */
+public class Main {
 
-import com.noteshare.spider.chinasky.services.RealTimeService;
-import com.noteshare.spider.chinasky.services.impl.RealTimeServiceImpl;
-import com.noteshare.spider.common.beans.RequestParams;
-import com.noteshare.spider.common.util.SpiderUtil;
-
-import net.sf.json.JSONObject;
-
-public class Main{
-	
 	public static void main(String[] args) throws Exception {
-		//创建jframe
+		/**====================================窗口的绘制=============================start==*/
+		// 创建jframe
 		JFrame frame = new JFrame("FrameDemo");
+		frame.setResizable(false);
 		frame.setTitle("抓取中国天气数据");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setBounds(100, 100, 450, 300);
-        frame.setVisible(true);
-        //创建jpanel
-		JPanel jpanel = new JPanel();
-		jpanel.setBorder(new EmptyBorder(5,5,5,5));
-		//采用绝对布局
-		jpanel.setLayout(null);
-		frame.setContentPane(jpanel);
-		//创建按钮
-		JButton button=new JButton("执行");
-		button.setSize(60, 30);
-		button.setLocation(0, 0);
-		jpanel.add(button);
+		frame.setBounds(400, 400, 400, 150);
+		frame.setVisible(true);
+		// 创建jpanel
+		JPanel mainJpanel = new JPanel();
+		// 采用绝对布局
+		mainJpanel.setLayout(new BorderLayout());
+		frame.setContentPane(mainJpanel);
+		//==========================窗口头部表单区=================start
+		/*JPanel centerJpanel = new JPanel(new GridLayout(1, 2));
+		centerJpanel.setBorder(BorderFactory.createTitledBorder("说明:"));
+		Label periodLabel = new Label("interval time（seconds）：");
+		periodLabel.setSize(120, 45);
+		final TextField periodText = new TextField();
+		centerJpanel.add(periodLabel);
+		centerJpanel.add(periodText);
+		mainJpanel.add(centerJpanel, BorderLayout.PAGE_START);*/
+		//==========================窗口中部说明区=================start
+		JPanel northJPanel = new JPanel();
+		Label desLabel = new Label("You can click on the set button below to set the task time interval,");
+		Label desLabel2 = new Label(" the interval of the default time of 1 minute.                       ");
+		northJPanel.add(desLabel);
+		northJPanel.add(desLabel2);
+		mainJpanel.add(northJPanel, BorderLayout.CENTER);
+		//==========================窗口中部说明区=================end
+		//==========================窗口底部按钮区==================start
+		//创建按钮面板
+		JPanel soutchJpanel = new JPanel();
+		soutchJpanel.setLayout(new FlowLayout());
+		// 创建开始按钮
+		final JButton startButton = new JButton("开始");
+		startButton.setSize(60, 30);
+		startButton.setVisible(true);
+		soutchJpanel.add(startButton);
+		//创建结束按钮
+		final JButton endButton = new JButton("停止");
+		endButton.setSize(60,30);
+		soutchJpanel.add(endButton);
+		endButton.setVisible(false);
+		
+		//创建间隔时间设置按钮
+		final JButton setButton = new JButton("设置");
+		setButton.setSize(60, 30);
+		soutchJpanel.add(setButton);
+		mainJpanel.add(soutchJpanel,BorderLayout.PAGE_END);
+		/**====================================窗口的绘制=============================end==*/
+		/**====================================业务处理=============================start==*/
+		//定义定时器
+		final Timer timer = new Timer();
+		Calendar calendar = Calendar.getInstance();
+		Date time = calendar.getTime(); // 得出执行任务的时间,此处为今天的12：00：00
+		//定义任务
+		final Task task = new Task();
+		timer.schedule(task, time, 6000);
+		/**====================================业务处理=============================end==*/
+		/**===========================================事件定义==========================start=======*/
 		/**
 		 * 单击执行按钮开始获取数据
 		 */
-		button.addMouseListener(new MouseAdapter() {
+		startButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				try {
-					Map<String, String> paramMap = new HashMap<String, String>();
-					RequestParams resParam = new RequestParams("http://www.weather.com.cn/weather1d/101190202.shtml", 0, paramMap);
-					Document doc = SpiderUtil.getDocument(resParam,null);
-					RealTimeService realTimeService = new RealTimeServiceImpl();
-					JSONObject json = realTimeService.getLiveIndex(doc);
-					File file = new File("D:\\test.txt");
-					FileOutputStream fos = new FileOutputStream(file);
-					PrintWriter pw = new PrintWriter(fos);
-					pw.write(json.toString());
-					pw.close();
-					
-					
-					
-				} catch (IOException e1) {
-					e1.printStackTrace();
+				startButton.setVisible(false);
+				endButton.setVisible(true);
+				task.setFlag(true);
+			}
+		});
+		
+		/**
+		 * 结束按钮监听鼠标点击事件
+		 */
+		endButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				startButton.setVisible(true);
+				endButton.setVisible(false);
+				task.setFlag(false);
+			}
+		});
+		/**
+		 * 设置按钮鼠标单击事件
+		 */
+		setButton.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				Object[] obj2 ={ "1分钟", "2分钟", "5分钟","10分钟","20分钟"};  
+				String value = (String) JOptionPane.showInputDialog(null,"请选择任务间隔时间单位为分钟:\n", "间隔时间", JOptionPane.PLAIN_MESSAGE, new ImageIcon("icon.png"), obj2, "1分钟");
+				if(null != value){
+					value = value.replace("分钟", "");
+					long period = Integer.valueOf(value) * 60 * 1000;
+					task.setPeriod(period);
 				}
 			}
 		});
+		
+		/**
+		 * 窗口关闭事件监听
+		 */
+		frame.addWindowListener(new WindowAdapter() {
+            public void windowClosing(WindowEvent e){
+            	//销毁定时器
+                System.exit(0);	
+            }
+        });
+		/**===========================================事件定义==========================end=======*/
 	}
 }
-
-
