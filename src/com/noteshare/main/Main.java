@@ -17,6 +17,8 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import com.noteshare.utils.Config;
+
 /**
  * @ClassName			: Main 
  * @Description			: 程序入口类
@@ -31,22 +33,13 @@ public class Main {
 		JFrame frame = new JFrame("FrameDemo");
 		frame.setResizable(false);
 		frame.setTitle("抓取中国天气数据");
-		frame.setBounds(400, 400, 400, 150);
-		frame.setVisible(true);
+		frame.setBounds(400, 400, 400, 140);
 		// 创建jpanel
 		JPanel mainJpanel = new JPanel();
 		// 采用绝对布局
 		mainJpanel.setLayout(new BorderLayout());
 		frame.setContentPane(mainJpanel);
 		//==========================窗口头部表单区=================start
-		/*JPanel centerJpanel = new JPanel(new GridLayout(1, 2));
-		centerJpanel.setBorder(BorderFactory.createTitledBorder("说明:"));
-		Label periodLabel = new Label("interval time（seconds）：");
-		periodLabel.setSize(120, 45);
-		final TextField periodText = new TextField();
-		centerJpanel.add(periodLabel);
-		centerJpanel.add(periodText);
-		mainJpanel.add(centerJpanel, BorderLayout.PAGE_START);*/
 		//==========================窗口中部说明区=================start
 		JPanel northJPanel = new JPanel();
 		Label desLabel = new Label("You can click on the set button below to set the task time interval,");
@@ -69,12 +62,13 @@ public class Main {
 		endButton.setSize(60,30);
 		soutchJpanel.add(endButton);
 		endButton.setVisible(false);
-		
 		//创建间隔时间设置按钮
 		final JButton setButton = new JButton("设置");
 		setButton.setSize(60, 30);
 		soutchJpanel.add(setButton);
 		mainJpanel.add(soutchJpanel,BorderLayout.PAGE_END);
+		//这个要放在后面，会触发所有可见组件的 paint方法
+		frame.setVisible(true);
 		/**====================================窗口的绘制=============================end==*/
 		/**====================================业务处理=============================start==*/
 		//定义定时器
@@ -83,7 +77,16 @@ public class Main {
 		Date time = calendar.getTime(); // 得出执行任务的时间,此处为今天的12：00：00
 		//定义任务
 		final Task task = new Task();
-		timer.schedule(task, time, 6000);
+		Config config = new Config("properties.properties");
+		//默认间隔时间
+		int defaultperiod = 6000;
+		try{
+			defaultperiod = config.parseInt("defaultperiod");
+			if(0 == defaultperiod){
+				defaultperiod = 6000;
+			}
+		}catch(Exception e){}
+		timer.schedule(task, time, defaultperiod);
 		/**====================================业务处理=============================end==*/
 		/**===========================================事件定义==========================start=======*/
 		/**

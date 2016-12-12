@@ -22,11 +22,11 @@ public class TestSpiderUtil {
 	public void init(){
 		Map<String,String> paramMap = new HashMap<String, String>();
 		//以下是拿实时数据的路径
-		//resParam = new RequestParams("http://d1.weather.com.cn/sk_2d/101190202.html?_=1481362573951",0,paramMap);
+		resParam = new RequestParams("http://d1.weather.com.cn/sk_2d/101190202.html?_=1481508057075", 0,paramMap);
 		//以下是拿生活指数数据的请求路径
 		//resParam = new RequestParams("http://www.weather.com.cn/weather1d/101190202.shtml",0,paramMap);
 		//以下是获取七天天气数据请求路径
-		resParam = new RequestParams("http://www.weather.com.cn/weather/101190202.shtml",0,paramMap);
+		//resParam = new RequestParams("http://www.weather.com.cn/weather/101190202.shtml",0,paramMap);
 	}
 	
 	/**
@@ -37,13 +37,12 @@ public class TestSpiderUtil {
 	 * @throws
 	 * 测试结果：{"nameen":"jiangyin","cityname":"江阴","city":"101190202","temp":"11","tempf":"51","WD":"东风","wde":"E ","WS":"3级","wse":"&lt;12km/h","SD":"58%","time":"12:55","weather":"多云","weathere":"Cloudy","weathercode":"d01","qy":"1026","njd":"暂无实况","sd":"58%","rain":"0","rain24h":"0","aqi":"60","limitnumber":"","aqi_pm25":"60","date":"12月10日(星期六)"}
 	 */
-	@Ignore
 	@Test
 	public void getTodayDataTest(){
 		try {
-			Map<String,String> headerMap = new HashMap<String, String>();
+			Map<String, String> headerMap = new HashMap<String, String>();
 			headerMap.put("Referer", "http://www.weather.com.cn/weather1d/101190202.shtml");
-			Document doc = SpiderUtil.getDocument(resParam,null);
+			Document doc = SpiderUtil.getDocument(resParam,headerMap);
 			RealTimeService realTimeService = new RealTimeServiceImpl();
 			JSONObject json = realTimeService.getTodayData(doc);
 			System.out.println(json);
@@ -78,6 +77,7 @@ public class TestSpiderUtil {
 	 * 测试结果：
 	 * {"2016-12-10":{"wea":"多云","daytimeTem":"12","nightTem":"7℃","daytimeWin":"东北风","nightWin":"东北风","winPower":"微风"},"2016-12-11":{"wea":"多云","daytimeTem":"14","nightTem":"8℃","daytimeWin":"东南风","nightWin":"东南风","winPower":"微风"},"2016-12-12":{"wea":"阴","daytimeTem":"17","nightTem":"9℃","daytimeWin":"北风","nightWin":"北风","winPower":"微风"},"2016-12-13":{"wea":"小雨转阴","daytimeTem":"13","nightTem":"4℃","daytimeWin":"北风","nightWin":"北风","winPower":"3-4级"},"2016-12-14":{"wea":"阴转多云","daytimeTem":"9","nightTem":"-1℃","daytimeWin":"西北风","nightWin":"西北风","winPower":"4-5级转3-4级"},"2016-12-15":{"wea":"多云","daytimeTem":"7","nightTem":"-2℃","daytimeWin":"西北风","nightWin":"西北风","winPower":"微风"},"2016-12-16":{"wea":"多云","daytimeTem":"9","nightTem":"2℃","daytimeWin":"东南风","nightWin":"东南风","winPower":"微风"}}
 	 */
+	@Ignore
 	@Test
 	public void get7dDataTest(){
 		try {

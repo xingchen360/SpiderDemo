@@ -7,3 +7,14 @@ http://blog.csdn.net/lmj623565791/article/details/23866427/
 http://htmlunit.sourceforge.net/
 
 http://stackoverflow.com/questions/3667352/htmlunit-and-xpath-domnode-getbyxpath-only-works-on-htmlpage
+
+
+以下是一些其他方案，暂时还未进行测试。
+1.阿里云中国天气接口：0.1/100次
+https://market.aliyun.com/products/57096001/cmapi010812.html?spm=5176.8216963.522267.1.WAsppE#sku=yuncode481200005
+2.webservice接口
+http://blog.csdn.net/is_zhoufeng/article/details/8485548
+3.阿凡达数据
+http://www.avatardata.cn/
+
+
