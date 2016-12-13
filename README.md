@@ -1,4 +1,4 @@
-# SpliderDemo
+# SpiderDemo
 ---
 ## 概述
 > 该项目是一个简单的采集网上信息的demo程序。主要采用了jsoup组件
