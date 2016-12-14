@@ -121,7 +121,7 @@ public class SkyDaoImpl implements SkyDao{
 		Connection conn = null;
 		try {
 			conn = DBUtil.getConnection();
-			String sql = "insert into T_SEVEN_DATA(XH,RQ,WEA,DAYTIMETEM,NIGHTTEM,DAYTIMEWIN,NIGHTWIN,WINPOWER,CJSJ,RQDES) values(?,?,?,?,?,?,?,?,?,?)";
+			String sql = "insert into T_SEVEN_DATA(XH,RQ,WEA,DAYTIMETEM,NIGHTTEM,DAYTIMEWIN,NIGHTWIN,WINPOWER,CJSJ,RQDES,DAYTIMEWEA,NIGHTWEA,DAYTIMEWINDPOWER,NIGHTWINDPOWER) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 			if(null != json){
 				@SuppressWarnings("unchecked")
 				Set<String> keySet = json.keySet();
@@ -146,6 +146,24 @@ public class SkyDaoImpl implements SkyDao{
 					pstmt.setString(8, winPower);
 					pstmt.setDate(9, gathertime);
 					pstmt.setString(10,rqdes);
+					//将wea拆分为白天晚上
+					String daytimewea = wea;
+					String nightwea = wea;
+					if(null != wea && !"".equals(wea) && wea.contains("转")){
+						daytimewea = wea.split("转")[0];
+						nightwea = wea.split("转")[1];
+					}
+					//将winPower拆分为白天晚上
+					String daytimewinpower = winPower;
+					String nightwinpower = winPower;
+					if(null != winPower && !"".equals(winPower) && winPower.contains("-")){
+						daytimewinpower = winPower.split("-")[0] + "级";
+						nightwinpower = winPower.split("-")[1];
+					}
+					pstmt.setString(11,daytimewea);
+					pstmt.setString(12,nightwea);
+					pstmt.setString(13,daytimewinpower);
+					pstmt.setString(14,nightwinpower);
 					pstmt.execute();
 				}
 			}
