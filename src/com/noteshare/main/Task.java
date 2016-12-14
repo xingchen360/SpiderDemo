@@ -16,8 +16,8 @@ import org.jsoup.nodes.Document;
 
 import com.noteshare.spider.chinasky.dao.SkyDao;
 import com.noteshare.spider.chinasky.dao.impl.SkyDaoImpl;
-import com.noteshare.spider.chinasky.services.RealTimeService;
-import com.noteshare.spider.chinasky.services.impl.RealTimeServiceImpl;
+import com.noteshare.spider.chinasky.services.SkyService;
+import com.noteshare.spider.chinasky.services.impl.SkyServiceImpl;
 import com.noteshare.spider.common.beans.RequestParams;
 import com.noteshare.spider.common.util.SpiderUtil;
 import com.noteshare.utils.Config;
@@ -73,15 +73,16 @@ public class Task extends TimerTask{
 			try {
 				fos = new FileOutputStream(file,true);
 				pw = new PrintWriter(fos);
-				RealTimeService realTimeService = new RealTimeServiceImpl();
+				SkyService skyService = new SkyServiceImpl();
+				//实时数据获取
 				try{
-					//实时数据获取
 					Map<String,String> realParamMap = new HashMap<String, String>();
 					RequestParams realResParam = new RequestParams("http://d1.weather.com.cn/sk_2d/101190202.html?_=1481362573951",0,realParamMap);
 					Map<String,String> realHeaderMap = new HashMap<String, String>();
 					realHeaderMap.put("Referer", "http://www.weather.com.cn/weather1d/101190202.shtml");
 					Document realDoc = SpiderUtil.getDocument(realResParam,realHeaderMap);
-					JSONObject realJson = realTimeService.getTodayData(realDoc);
+					//实时数据
+					JSONObject realJson = skyService.getRealData(realDoc);
 					//System.out.println("===========实时数据=====start=======");
 					//System.out.println(realJson);
 					dao.addRealData(realJson);
@@ -89,16 +90,30 @@ public class Task extends TimerTask{
 				}catch(Exception e){
 					pw.write(new Date().toString() +  ":====抓取实时数据异常;异常信息:\n" + e.getMessage() + "\n");
 				}
+				//当天数据
+				try{
+					Map<String,String> todayParamMap = new HashMap<String, String>();
+					RequestParams todayResParam = new RequestParams("http://www.weather.com.cn/weather1d/101190202.shtml",0,todayParamMap);
+					Document todayDoc = SpiderUtil.getDocument(todayResParam,null);
+					//实时数据
+					JSONObject todayJson = skyService.getTodayData(todayDoc);
+					//System.out.println("===========实时数据=====start=======");
+					dao.addTodayData(todayJson);
+					//System.out.println("===========实时数据======end======");
+				}catch(Exception e){
+					pw.write(new Date().toString() +  ":====抓取实时数据异常;异常信息\n" + e.getMessage() + "\n");
+				}
 				//生活指数
 				try {
 					Map<String,String> liveParamMap = new HashMap<String, String>();
 					RequestParams liveResParam = new RequestParams("http://www.weather.com.cn/weather1d/101190202.shtml",0,liveParamMap);
 					Document liveDoc = SpiderUtil.getDocument(liveResParam,null);
-					RealTimeService liveTimeService = new RealTimeServiceImpl();
+					SkyService liveTimeService = new SkyServiceImpl();
 					JSONObject liveJson = liveTimeService.getLiveIndex(liveDoc);
 					//System.out.println("===========生活指数======start=====");
 					//System.out.println(liveJson);
 					dao.addLiveData(liveJson);
+					dao.addLiveData2(liveJson);
 					//System.out.println("===========生活指数======end======");
 				} catch (IOException e) {
 					pw.write(new Date().toString() +  ":====抓取生活指数异常;异常信息:\n" + e.getMessage() + "\n");
@@ -108,7 +123,7 @@ public class Task extends TimerTask{
 					Map<String,String> sevdParamMap = new HashMap<String, String>();
 					RequestParams sevdResParam = new RequestParams("http://www.weather.com.cn/weather/101190202.shtml",0,sevdParamMap);
 					Document sevdDoc = SpiderUtil.getDocument(sevdResParam,null);
-					JSONObject sevdjson = realTimeService.get7dData(sevdDoc);
+					JSONObject sevdjson = skyService.get7dData(sevdDoc);
 					//System.out.println("===========7天数据======start=====");
 					//System.out.println(sevdjson);
 					dao.add7DayData(sevdjson);

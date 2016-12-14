@@ -9,8 +9,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.noteshare.spider.chinasky.services.RealTimeService;
-import com.noteshare.spider.chinasky.services.impl.RealTimeServiceImpl;
+import com.noteshare.spider.chinasky.services.SkyService;
+import com.noteshare.spider.chinasky.services.impl.SkyServiceImpl;
 import com.noteshare.spider.common.beans.RequestParams;
 
 import net.sf.json.JSONObject;
@@ -43,8 +43,8 @@ public class TestSpiderUtil {
 			Map<String, String> headerMap = new HashMap<String, String>();
 			headerMap.put("Referer", "http://www.weather.com.cn/weather1d/101190202.shtml");
 			Document doc = SpiderUtil.getDocument(resParam,headerMap);
-			RealTimeService realTimeService = new RealTimeServiceImpl();
-			JSONObject json = realTimeService.getTodayData(doc);
+			SkyService realTimeService = new SkyServiceImpl();
+			JSONObject json = realTimeService.getRealData(doc);
 			System.out.println(json);
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -63,7 +63,7 @@ public class TestSpiderUtil {
 	@Test
 	public void getLiveIndexTest() throws IOException{
 		Document doc = SpiderUtil.getDocument(resParam,null);
-		RealTimeService realTimeService = new RealTimeServiceImpl();
+		SkyService realTimeService = new SkyServiceImpl();
 		JSONObject json = realTimeService.getLiveIndex(doc);
 		System.out.println(json);
 	}
@@ -82,7 +82,7 @@ public class TestSpiderUtil {
 	public void get7dDataTest(){
 		try {
 			Document doc = SpiderUtil.getDocument(resParam,null);
-			RealTimeService realTimeService = new RealTimeServiceImpl();
+			SkyService realTimeService = new SkyServiceImpl();
 			JSONObject json = realTimeService.get7dData(doc);
 			System.out.println(json);
 		} catch (IOException e) {

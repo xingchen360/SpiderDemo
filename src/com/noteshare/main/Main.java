@@ -41,12 +41,12 @@ public class Main {
 		frame.setContentPane(mainJpanel);
 		//==========================窗口头部表单区=================start
 		//==========================窗口中部说明区=================start
-		JPanel northJPanel = new JPanel();
+		JPanel centerJPanel = new JPanel();
 		Label desLabel = new Label("You can click on the set button below to set the task time interval,");
 		Label desLabel2 = new Label(" the interval of the default time of 1 minute.                       ");
-		northJPanel.add(desLabel);
-		northJPanel.add(desLabel2);
-		mainJpanel.add(northJPanel, BorderLayout.CENTER);
+		centerJPanel.add(desLabel);
+		centerJPanel.add(desLabel2);
+		mainJpanel.add(centerJPanel, BorderLayout.CENTER);
 		//==========================窗口中部说明区=================end
 		//==========================窗口底部按钮区==================start
 		//创建按钮面板

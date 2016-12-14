@@ -10,25 +10,46 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import com.noteshare.spider.chinasky.services.RealTimeService;
+import com.noteshare.spider.chinasky.services.SkyService;
 import com.noteshare.spider.common.util.SpiderConstant;
 import com.noteshare.spider.common.util.SpiderUtil;
 
 import net.sf.json.JSONObject;
 
-public class RealTimeServiceImpl implements RealTimeService{
-
-	@Override
-	public Element getTodayDiv(Document doc,String id) {
-		//处理返回数据
-		Elements results = SpiderUtil.getElements(SpiderConstant.IDSELECTOR,id,doc);
-		if(null != results && !results.isEmpty())
-			return results.get(0);
-		return null;
-	}
+public class SkyServiceImpl implements SkyService{
 
 	@Override
 	public JSONObject getTodayData(Document doc) {
+		JSONObject json = new JSONObject();
+		Elements elements = SpiderUtil.getElements(SpiderConstant.IDSELECTOR, "today", doc);
+		Element todayElement = elements.get(0);
+		Element ulElement = todayElement.getElementsByTag("ul").get(0);
+		Elements liElements = ulElement.getElementsByTag("li");
+		Element daytimeElment = liElements.get(0);
+		Element nightElement = liElements.get(1);
+		//白天
+		String daytime_weather = daytimeElment.getElementsByClass("wea").text();
+		String daytime_temperature = daytimeElment.getElementsByClass("tem").get(0).getElementsByTag("span").text();
+		String daytime_windDirection = daytimeElment.getElementsByClass("win").get(0).getElementsByTag("span").attr("title");
+		String daytime_windPower = daytimeElment.getElementsByClass("win").get(0).getElementsByTag("span").text();
+		//晚上
+		String night_weather = nightElement.getElementsByClass("wea").text();
+		String night_temperature = nightElement.getElementsByClass("tem").get(0).getElementsByTag("span").text();
+		String night_windDirection = nightElement.getElementsByClass("win").get(0).getElementsByTag("span").attr("title");
+		String night_windPower = nightElement.getElementsByClass("win").get(0).getElementsByTag("span").text();
+		json.put("daytime_weather", daytime_weather);
+		json.put("daytime_temperature", daytime_temperature);
+		json.put("daytime_windDirection", daytime_windDirection);
+		json.put("daytime_windPower", daytime_windPower);
+		json.put("night_weather", night_weather);
+		json.put("night_temperature", night_temperature);
+		json.put("night_windDirection", night_windDirection);
+		json.put("night_windPower", night_windPower);
+		return json;
+	}
+
+	@Override
+	public JSONObject getRealData(Document doc) {
 		Element body = doc.getElementsByTag("body").get(0);
 		String dataSK = ""; 
 		if(null != body){
@@ -96,12 +117,15 @@ public class RealTimeServiceImpl implements RealTimeService{
 			calendar.add(Calendar.DATE,1);//把日期往后增加一天.整数往后推,负数往前移动 
 			Date keyDate = calendar.getTime();
 			String dayStr = sdf.format(keyDate);
+			//日期描述
+			String rqdes = element.getElementsByTag("h1").text();
 			jsontemp.put("wea", wea);
 			jsontemp.put("daytimeTem", daytimeTem);
 			jsontemp.put("nightTem", nightTem);
 			jsontemp.put("daytimeWin", daytimeWin);
 			jsontemp.put("nightWin", nightWin);
 			jsontemp.put("winPower", winPower);
+			jsontemp.put("rqdes", rqdes);
 			json.put(dayStr, jsontemp);
 		}
 		return json;

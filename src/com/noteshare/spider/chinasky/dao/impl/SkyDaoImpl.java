@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.noteshare.spider.chinasky.dao.SkyDao;
+import com.noteshare.spider.common.exceptions.SpiderException;
 import com.noteshare.utils.DBUtil;
 
 import net.sf.json.JSONObject;
@@ -45,7 +46,66 @@ public class SkyDaoImpl implements SkyDao{
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new SpiderException("插入t_live_data数据异常:" + e.getMessage());
+		}finally {
+			try {
+				DBUtil.closeCon(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	@Override
+	public void addLiveData2(JSONObject json) {
+		//{"紫外线指数":{"value":"最弱","content":"辐射弱，涂擦SPF8-12防晒护肤品。"},
+		//"感冒指数":{"value":"较易发","content":"天较凉，增加衣服，注意防护。"},
+		//"穿衣指数":{"value":"较冷","content":"建议着厚外套加毛衣等服装。"},
+		//"洗车指数":{"value":"较适宜","content":"无雨且风力较小，易保持清洁度。"},
+		//"运动指数":{"value":"较适宜","content":"气温较低，推荐您进行室内运动。"},
+		//"空气污染扩散指数":{"value":"中","content":"易感人群应适当减少室外活动。"}}
+		Connection conn = null;
+		try {
+			conn = DBUtil.getConnection();
+			String sql = "insert into T_LIVE_DATA2(XH,ZWXVALUE,ZWXCONTENT,GMVALUE,GMCONTENT,CYVALUE,CYCONTENT,XCVALUE,XCCONTENT,YDVALUE,YDCONTENT,KQWRKSVALUE,KQWRKSCONTENT,CJSJ) values(?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+			if(null != json){
+				JSONObject zwxJson = json.getJSONObject("紫外线指数");
+				JSONObject gmJson = json.getJSONObject("感冒指数");
+				JSONObject cyJson = json.getJSONObject("穿衣指数");
+				JSONObject xcJson = json.getJSONObject("洗车指数");
+				JSONObject ydJson = json.getJSONObject("运动指数");
+				JSONObject kqwrksJson = json.getJSONObject("空气污染扩散指数");
+				PreparedStatement pstmt = conn.prepareStatement(sql);
+				pstmt.setString(1, UUID.randomUUID().toString());
+				String ZWXVALUE = (null != zwxJson ? zwxJson.getString("value") : "");
+				String ZWXCONTENT = (null != zwxJson ? zwxJson.getString("content") : "");
+				pstmt.setString(2, ZWXVALUE);
+				pstmt.setString(3, ZWXCONTENT);
+				String GMVALUE = (null != gmJson ? gmJson.getString("value") : "");
+				String GMCONTENT = (null != gmJson ? gmJson.getString("content") : "");
+				pstmt.setString(4, GMVALUE);
+				pstmt.setString(5, GMCONTENT);
+				String CYVALUE = (null != cyJson ? cyJson.getString("value") : "");
+				String CYCONTENT = (null != cyJson ? cyJson.getString("content") : "");
+				pstmt.setString(6, CYVALUE);
+				pstmt.setString(7, CYCONTENT);
+				String XCVALUE = (null != xcJson ? xcJson.getString("value") : "");
+				String XCCONTENT = (null != xcJson ? xcJson.getString("content") : "");
+				pstmt.setString(8, XCVALUE);
+				pstmt.setString(9, XCCONTENT);
+				String YDVALUE = (null != ydJson ? ydJson.getString("value") : "");
+				String YDCONTENT = (null != ydJson ? ydJson.getString("content") : "");
+				pstmt.setString(10, YDVALUE);
+				pstmt.setString(11, YDCONTENT);
+				String KQWRKSVALUE = (null != kqwrksJson ? kqwrksJson.getString("value") : "");
+				String KQWRKSCONTENT = (null != kqwrksJson ? kqwrksJson.getString("content") : "");
+				pstmt.setString(12, KQWRKSVALUE);
+				pstmt.setString(13, KQWRKSCONTENT);
+				Date gathertime = new Date(new java.util.Date().getTime());
+				pstmt.setDate(14, gathertime);
+				pstmt.execute();
+			}
+		} catch (Exception e) {
+			throw new SpiderException("插入t_live_data数据异常:" + e.getMessage());
 		}finally {
 			try {
 				DBUtil.closeCon(conn);
@@ -57,24 +117,18 @@ public class SkyDaoImpl implements SkyDao{
 
 	@Override
 	public void add7DayData(JSONObject json) {
-		//{"2016-12-10":{"wea":"多云","daytimeTem":"12","nightTem":"7℃","daytimeWin":"东北风","nightWin":"东北风","winPower":"微风"},
-		//"2016-12-11":{"wea":"多云","daytimeTem":"14","nightTem":"8℃","daytimeWin":"东南风","nightWin":"东南风","winPower":"微风"},
-		//"2016-12-12":{"wea":"阴","daytimeTem":"17","nightTem":"9℃","daytimeWin":"北风","nightWin":"北风","winPower":"微风"},
-		//"2016-12-13":{"wea":"小雨转阴","daytimeTem":"13","nightTem":"4℃","daytimeWin":"北风","nightWin":"北风","winPower":"3-4级"},
-		//"2016-12-14":{"wea":"阴转多云","daytimeTem":"9","nightTem":"-1℃","daytimeWin":"西北风","nightWin":"西北风","winPower":"4-5级转3-4级"},
-		//"2016-12-15":{"wea":"多云","daytimeTem":"7","nightTem":"-2℃","daytimeWin":"西北风","nightWin":"西北风","winPower":"微风"},
-		//"2016-12-16":{"wea":"多云","daytimeTem":"9","nightTem":"2℃","daytimeWin":"东南风","nightWin":"东南风","winPower":"微风"}}
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		Connection conn = null;
 		try {
 			conn = DBUtil.getConnection();
-			String sql = "insert into T_SEVEN_DATA(XH,RQ,WEA,DAYTIMETEM,NIGHTTEM,DAYTIMEWIN,NIGHTWIN,WINPOWER,CJSJ,STARTTIME) values(?,?,?,?,?,?,?,?,?,?)";
+			String sql = "insert into T_SEVEN_DATA(XH,RQ,WEA,DAYTIMETEM,NIGHTTEM,DAYTIMEWIN,NIGHTWIN,WINPOWER,CJSJ,RQDES) values(?,?,?,?,?,?,?,?,?,?)";
 			if(null != json){
 				@SuppressWarnings("unchecked")
 				Set<String> keySet = json.keySet();
 				for (String key : keySet) {
 					PreparedStatement pstmt = conn.prepareStatement(sql);
 					pstmt.setString(1, UUID.randomUUID().toString());
-					pstmt.setString(2, key);
+					pstmt.setDate(2,new Date(sdf.parse(key).getTime()));
 					JSONObject valueJson = (JSONObject) json.get(key);
 					String wea = valueJson.getString("wea");
 					String daytimeTem = valueJson.getString("daytimeTem");
@@ -82,6 +136,7 @@ public class SkyDaoImpl implements SkyDao{
 					String daytimeWin = valueJson.getString("daytimeWin");
 					String nightWin = valueJson.getString("nightWin");
 					String winPower = valueJson.getString("winPower");
+					String rqdes = valueJson.getString("rqdes");
 					Date gathertime = new Date(new java.util.Date().getTime());
 					pstmt.setString(3, wea);
 					pstmt.setString(4, daytimeTem);
@@ -90,13 +145,12 @@ public class SkyDaoImpl implements SkyDao{
 					pstmt.setString(7, nightWin);
 					pstmt.setString(8, winPower);
 					pstmt.setDate(9, gathertime);
-					SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-					pstmt.setString(10, sdf.format(new java.util.Date()));
+					pstmt.setString(10,rqdes);
 					pstmt.execute();
 				}
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new SpiderException("插入T_SEVEN_DATA数据异常:" + e.getMessage());
 		}finally {
 			try {
 				DBUtil.closeCon(conn);
@@ -118,8 +172,8 @@ public class SkyDaoImpl implements SkyDao{
 		Connection conn = null;
 		try {
 			conn = DBUtil.getConnection();
-			String sql = "insert into T_TODAY_DATA(XH,NAMEEN,CITYNAME,CITY,TEMP,TEMPF,WD,WDE,WS,WSE,SD,UPDATETIME,WEATHER,WEATHERE,AQI,AQI_PM25,CJSJ) " + 
-			"values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+			String sql = "insert into T_REAL_DATA(XH,NAMEEN,CITYNAME,CITY,TEMP,TEMPF,WD,WDE,WS,WSE,SD,UPDATETIME,WEATHER,WEATHERE,AQI,AQI_PM25,CJSJ,RQ) " + 
+			"values(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 			if(null != json){
 				PreparedStatement pstmt = conn.prepareStatement(sql);
 				pstmt.setString(1, UUID.randomUUID().toString());
@@ -144,10 +198,11 @@ public class SkyDaoImpl implements SkyDao{
 				pstmt.setString(15, json.getString("aqi"));
 				pstmt.setString(16, json.getString("aqi_pm25"));
 				pstmt.setDate(17, new Date(new java.util.Date().getTime()));
+				pstmt.setString(18, json.getString("date"));
 				pstmt.execute();
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new SpiderException("插入T_REAL_DATA数据异常:" + e.getMessage());
 		}finally {
 			try {
 				DBUtil.closeCon(conn);
@@ -155,5 +210,38 @@ public class SkyDaoImpl implements SkyDao{
 				e.printStackTrace();
 			}
 		}
+	}
+
+	@Override
+	public void addTodayData(JSONObject json) {
+		Connection conn = null;
+		try {
+			conn = DBUtil.getConnection();
+			String sql = "insert into T_TODAY_DATA(XH,DAYTIMETEM,DAYTIMEWEATHER,DAYTIMEWINDDIRECTION,DAYTIMEWINDLEVEL,NIGHTTEM,NIGHTWEATHER,NIGHTWINDDIRECTION,NIGHTWINDLEVEL,CJSJ) " + 
+			"values(?,?,?,?,?,?,?,?,?,?)";
+			if(null != json){
+				PreparedStatement pstmt = conn.prepareStatement(sql);
+				pstmt.setString(1, UUID.randomUUID().toString());
+				pstmt.setString(2, json.getString("daytime_temperature"));
+				pstmt.setString(3, json.getString("daytime_weather"));
+				pstmt.setString(4, json.getString("daytime_windDirection"));
+				pstmt.setString(5, json.getString("daytime_windPower"));
+				pstmt.setString(6, json.getString("night_temperature"));
+				pstmt.setString(7, json.getString("night_weather"));
+				pstmt.setString(8, json.getString("night_windDirection"));
+				pstmt.setString(9, json.getString("night_windPower"));
+				pstmt.setDate(10, new Date(new java.util.Date().getTime()));
+				pstmt.execute();
+			}
+		} catch (Exception e) {
+			throw new SpiderException("插入T_TODAY_DATA数据异常" + e.getMessage());
+		}finally {
+			try {
+				DBUtil.closeCon(conn);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+		
 	}
 }
