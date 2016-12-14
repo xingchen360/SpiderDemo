@@ -33,7 +33,7 @@ public class Main {
 		JFrame frame = new JFrame("FrameDemo");
 		frame.setResizable(false);
 		frame.setTitle("抓取中国天气数据");
-		frame.setBounds(400, 400, 400, 140);
+		frame.setBounds(400, 400, 400, 160);
 		// 创建jpanel
 		JPanel mainJpanel = new JPanel();
 		// 采用绝对布局
@@ -43,9 +43,11 @@ public class Main {
 		//==========================窗口中部说明区=================start
 		JPanel centerJPanel = new JPanel();
 		Label desLabel = new Label("You can click on the set button below to set the task time interval,");
-		Label desLabel2 = new Label(" the interval of the default time of 1 minute.                       ");
+		Label desLabel2 = new Label(" the interval of the default time of 1 minute.");
+		final Label desLabel3 = new Label("[now: 1 minute run 1 time.]");
 		centerJPanel.add(desLabel);
 		centerJPanel.add(desLabel2);
+		centerJPanel.add(desLabel3);
 		mainJpanel.add(centerJPanel, BorderLayout.CENTER);
 		//==========================窗口中部说明区=================end
 		//==========================窗口底部按钮区==================start
@@ -124,6 +126,7 @@ public class Main {
 					value = value.replace("分钟", "");
 					long period = Integer.valueOf(value) * 60 * 1000;
 					task.setPeriod(period);
+					desLabel3.setText("[now: " + value + " minute run 1 time.]");
 				}
 			}
 		});

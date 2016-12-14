@@ -84,7 +84,9 @@ public class Task extends TimerTask{
     	SkyDao dao = new SkyDaoImpl();
     	Map<String,String> todayParamMap = new HashMap<String, String>();
 		RequestParams todayResParam = new RequestParams("http://www.weather.com.cn/weather1d/101190202.shtml",0,todayParamMap);
-		Document todayDoc = SpiderUtil.getDocument(todayResParam,null);
+		Map<String,String> realHeaderMap = new HashMap<String, String>();
+		realHeaderMap.put("Referer", "http://www.weather.com.cn/weather1d/101280601.shtml");
+		Document todayDoc = SpiderUtil.getDocument(todayResParam,realHeaderMap);
 		//实时数据
 		JSONObject todayJson = skyService.getTodayData(todayDoc);
 		dao.addTodayData(todayJson);
@@ -101,7 +103,9 @@ public class Task extends TimerTask{
     	SkyDao dao = new SkyDaoImpl();
     	Map<String,String> liveParamMap = new HashMap<String, String>();
 		RequestParams liveResParam = new RequestParams("http://www.weather.com.cn/weather1d/101190202.shtml",0,liveParamMap);
-		Document liveDoc = SpiderUtil.getDocument(liveResParam,null);
+		Map<String,String> realHeaderMap = new HashMap<String, String>();
+		realHeaderMap.put("Referer", "http://www.weather.com.cn/weather1d/101280601.shtml");
+		Document liveDoc = SpiderUtil.getDocument(liveResParam,realHeaderMap);
 		JSONObject liveJson = skyService.getLiveIndex(liveDoc);
 		//dao.addLiveData(liveJson);
 		dao.addLiveData2(liveJson);
@@ -118,7 +122,9 @@ public class Task extends TimerTask{
     	SkyDao dao = new SkyDaoImpl();
     	Map<String,String> sevdParamMap = new HashMap<String, String>();
 		RequestParams sevdResParam = new RequestParams("http://www.weather.com.cn/weather/101190202.shtml",0,sevdParamMap);
-		Document sevdDoc = SpiderUtil.getDocument(sevdResParam,null);
+		Map<String,String> realHeaderMap = new HashMap<String, String>();
+		realHeaderMap.put("Referer", "http://www.weather.com.cn/weather1d/101280601.shtml");
+		Document sevdDoc = SpiderUtil.getDocument(sevdResParam,realHeaderMap);
 		JSONObject sevdjson = skyService.get7dData(sevdDoc);
 		dao.add7DayData(sevdjson);
     }
@@ -129,6 +135,7 @@ public class Task extends TimerTask{
 			//System.out.println("任务开始执行！！！");
 			Date now = new Date();
 			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+			SimpleDateFormat sdflog = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String today = sdf.format(now);
 			Config config = new Config("properties.properties");
 			String logPath = config.parseString("logPath");
@@ -152,7 +159,7 @@ public class Task extends TimerTask{
 						System.out.println("==========抓取实时数据异常=========");
 						e.printStackTrace();
 					}
-					pw.write(new Date().toString() +  ":====抓取实时数据异常;异常信息:\n" + e.getMessage() + "\n");
+					pw.write(sdflog.format(new Date()) +  ":====抓取实时数据异常;异常信息:\n" + e.getMessage() + "\n");
 					//补抓一次
 					try{
 						realData();
@@ -161,7 +168,7 @@ public class Task extends TimerTask{
 							System.out.println("==========补抓抓取实时数据异常=========");
 			        		ex.printStackTrace();
 						}
-						pw.write(new Date().toString() +  ":====补抓抓取实时数据异常;异常信息:\n" + ex.getMessage() + "\n");
+						pw.write(sdflog.format(new Date()) +  ":====补抓抓取实时数据异常;异常信息:\n" + ex.getMessage() + "\n");
 					}
 				}
 				//当天数据
@@ -172,7 +179,7 @@ public class Task extends TimerTask{
 						System.out.println("==========抓取当天数据异常=========");
 		        		e.printStackTrace();
 					}
-					pw.write(new Date().toString() +  ":====抓取当天数据异常;异常信息\n" + e.getMessage() + "\n");
+					pw.write(sdflog.format(new Date()) +  ":====抓取当天数据异常;异常信息\n" + e.getMessage() + "\n");
 					//补抓一次
 					try{
 						todayData();
@@ -181,7 +188,7 @@ public class Task extends TimerTask{
 							System.out.println("==========补抓抓取当天数据异常=========");
 			        		ex.printStackTrace();
 						}
-						pw.write(new Date().toString() +  ":====补抓抓取当天数据异常;异常信息\n" + ex.getMessage() + "\n");
+						pw.write(sdflog.format(new Date()) +  ":====补抓抓取当天数据异常;异常信息\n" + ex.getMessage() + "\n");
 					}
 				}
 				//生活指数
@@ -192,7 +199,7 @@ public class Task extends TimerTask{
 						System.out.println("==========抓取生活指数异常=========");
 		        		e.printStackTrace();
 					}
-					pw.write(new Date().toString() +  ":====抓取生活指数异常;异常信息:\n" + e.getMessage() + "\n");
+					pw.write(sdflog.format(new Date()) +  ":====抓取生活指数异常;异常信息:\n" + e.getMessage() + "\n");
 					try{
 						liveData();
 					}catch(Exception ex){
@@ -200,7 +207,7 @@ public class Task extends TimerTask{
 							System.out.println("==========补抓抓取生活指数异常=========");
 			        		ex.printStackTrace();
 						}
-						pw.write(new Date().toString() +  ":====补抓抓取生活指数异常;异常信息:\n" + ex.getMessage() + "\n");
+						pw.write(sdflog.format(new Date()) +  ":====补抓抓取生活指数异常;异常信息:\n" + ex.getMessage() + "\n");
 					}
 				}
 				//7天数据
@@ -211,7 +218,7 @@ public class Task extends TimerTask{
 						System.out.println("==========抓取7天数据异常=========");
 		        		e.printStackTrace();
 					}
-					pw.write(new Date().toString() +  ":====抓取7天数据异常;异常信息:\n" + e.getMessage() + "\n");
+					pw.write(sdflog.format(new Date()) +  ":====抓取7天数据异常;异常信息:\n" + e.getMessage() + "\n");
 					//补抓一次
 					try{
 						day7Data();
@@ -220,7 +227,7 @@ public class Task extends TimerTask{
 							System.out.println("==========补抓抓取7天数据异常=========");
 			        		ex.printStackTrace();
 						}
-						pw.write(new Date().toString() +  ":====补抓抓取7天数据异常;异常信息:\n" + ex.getMessage() + "\n");
+						pw.write(sdflog.format(new Date()) +  ":====补抓抓取7天数据异常;异常信息:\n" + ex.getMessage() + "\n");
 					}
 				}
 				pw.close();
