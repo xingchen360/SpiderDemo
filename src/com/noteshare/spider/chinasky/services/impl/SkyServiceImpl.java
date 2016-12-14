@@ -130,47 +130,4 @@ public class SkyServiceImpl implements SkyService{
 		}
 		return json;
 	}
-	
-	/*
-	 * 次方方法是根据首页的24小时数据解析实时数据，数据并不是很准，留作备用
-	 * public Map<String, String> getTodayDataMethod1(Element todayElement) {
-		//数据集合
-		Map<String,String> dataMap = new HashMap<String, String>();
-		Elements elementScripts = todayElement.parent().getElementsByTag("script");
-		String observe24h_data = "";
-		for (Element element : elementScripts) {
-			String text = element.html();
-			if(null != text && text.contains("observe24h_data")){
-				observe24h_data = text;
-			}
-		}
-		if("" != observe24h_data){
-			observe24h_data = observe24h_data.replace("var observe24h_data = ", "");
-			JSONObject json = JSONObject.fromObject(observe24h_data);
-			JSONObject jsonod = json.getJSONObject("od");
-			//updatetime
-			String updatetime = jsonod.getString("od0");
-			String city = jsonod.getString("od1");
-			JSONArray jsonArr = jsonod.getJSONArray("od2");
-			//获取最新的一条数据记录
-			//温度
-			String temperature = "";
-			//湿度
-			String humidity = "";
-			//风向
-			String windDirection = "";
-			//风力
-			String windPower = "";
-			//采集时间
-			String getTime = "";
-			if(null != jsonArr && !jsonArr.isEmpty()){
-				
-			}
-			
-		}else{
-			return null;
-		}
-		return dataMap;
-	}
-*/
 }

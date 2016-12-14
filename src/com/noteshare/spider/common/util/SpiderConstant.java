@@ -2,6 +2,10 @@ package com.noteshare.spider.common.util;
 
 public class SpiderConstant {
 	/**
+	 * 调试环境
+	 */
+	public static final boolean DEBUG = true;
+	/**
 	 * GET请求
 	 */
 	public static final int GET = 0;

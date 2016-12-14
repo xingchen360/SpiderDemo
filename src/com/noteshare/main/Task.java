@@ -19,6 +19,7 @@ import com.noteshare.spider.chinasky.dao.impl.SkyDaoImpl;
 import com.noteshare.spider.chinasky.services.SkyService;
 import com.noteshare.spider.chinasky.services.impl.SkyServiceImpl;
 import com.noteshare.spider.common.beans.RequestParams;
+import com.noteshare.spider.common.util.SpiderConstant;
 import com.noteshare.spider.common.util.SpiderUtil;
 import com.noteshare.utils.Config;
 
@@ -45,12 +46,83 @@ public class Task extends TimerTask{
             field.setAccessible(true);  
             field.set(obj, value);  
             return true;  
-        } catch (Exception ex) {  
-            ex.printStackTrace();  
+        } catch (Exception ex) {
+        	if(SpiderConstant.DEBUG){
+        		ex.printStackTrace();
+			}
             return false;  
         }
     }  
-	
+	/**
+	 * @Description: 实时数据处理方法
+	 * @throws IOException
+	 * @author     : NoteShare
+	 * Create Date : 2016年12月14日 下午2:49:02
+	 * @throws
+	 */
+    private void realData() throws Exception{
+    	SkyService skyService = new SkyServiceImpl();
+    	SkyDao dao = new SkyDaoImpl();
+    	Map<String,String> realParamMap = new HashMap<String, String>();
+		RequestParams realResParam = new RequestParams("http://d1.weather.com.cn/sk_2d/101190202.html",0,realParamMap);
+		Map<String,String> realHeaderMap = new HashMap<String, String>();
+		realHeaderMap.put("Referer", "http://www.weather.com.cn/weather1d/101190202.shtml");
+		Document realDoc = SpiderUtil.getDocument(realResParam,realHeaderMap);
+		//实时数据
+		JSONObject realJson = skyService.getRealData(realDoc);
+		dao.addRealData(realJson);
+    }
+    /**
+     * @Description: 当天数据
+     * @throws Exception
+     * @author     : NoteShare
+     * Create Date : 2016年12月14日 下午2:49:51
+     * @throws
+     */
+    private void todayData() throws Exception{
+    	SkyService skyService = new SkyServiceImpl();
+    	SkyDao dao = new SkyDaoImpl();
+    	Map<String,String> todayParamMap = new HashMap<String, String>();
+		RequestParams todayResParam = new RequestParams("http://www.weather.com.cn/weather1d/101190202.shtml",0,todayParamMap);
+		Document todayDoc = SpiderUtil.getDocument(todayResParam,null);
+		//实时数据
+		JSONObject todayJson = skyService.getTodayData(todayDoc);
+		dao.addTodayData(todayJson);
+    }
+    /**
+     * @Description: 生活指数
+     * @throws Exception
+     * @author     : NoteShare
+     * Create Date : 2016年12月14日 下午2:51:57
+     * @throws
+     */
+    private void liveData() throws Exception{
+    	SkyService skyService = new SkyServiceImpl();
+    	SkyDao dao = new SkyDaoImpl();
+    	Map<String,String> liveParamMap = new HashMap<String, String>();
+		RequestParams liveResParam = new RequestParams("http://www.weather.com.cn/weather1d/101190202.shtml",0,liveParamMap);
+		Document liveDoc = SpiderUtil.getDocument(liveResParam,null);
+		JSONObject liveJson = skyService.getLiveIndex(liveDoc);
+		//dao.addLiveData(liveJson);
+		dao.addLiveData2(liveJson);
+    }
+    /**
+     * @Description: 7天数据
+     * @throws Exception
+     * @author     : NoteShare
+     * Create Date : 2016年12月14日 下午2:53:54
+     * @throws
+     */
+    private void day7Data() throws Exception{
+    	SkyService skyService = new SkyServiceImpl();
+    	SkyDao dao = new SkyDaoImpl();
+    	Map<String,String> sevdParamMap = new HashMap<String, String>();
+		RequestParams sevdResParam = new RequestParams("http://www.weather.com.cn/weather/101190202.shtml",0,sevdParamMap);
+		Document sevdDoc = SpiderUtil.getDocument(sevdResParam,null);
+		JSONObject sevdjson = skyService.get7dData(sevdDoc);
+		dao.add7DayData(sevdjson);
+    }
+    
 	@Override
 	public void run() {
 		if(flag){
@@ -69,67 +141,87 @@ public class Task extends TimerTask{
 			File file = new File(filesPath + today + ".log");
 			FileOutputStream fos = null;
 			PrintWriter pw = null;
-			SkyDao dao = new SkyDaoImpl();
 			try {
 				fos = new FileOutputStream(file,true);
 				pw = new PrintWriter(fos);
-				SkyService skyService = new SkyServiceImpl();
 				//实时数据获取
 				try{
-					Map<String,String> realParamMap = new HashMap<String, String>();
-					RequestParams realResParam = new RequestParams("http://d1.weather.com.cn/sk_2d/101190202.html?_=1481362573951",0,realParamMap);
-					Map<String,String> realHeaderMap = new HashMap<String, String>();
-					realHeaderMap.put("Referer", "http://www.weather.com.cn/weather1d/101190202.shtml");
-					Document realDoc = SpiderUtil.getDocument(realResParam,realHeaderMap);
-					//实时数据
-					JSONObject realJson = skyService.getRealData(realDoc);
-					//System.out.println("===========实时数据=====start=======");
-					//System.out.println(realJson);
-					dao.addRealData(realJson);
-					//System.out.println("===========实时数据======end======");
+					realData();
 				}catch(Exception e){
+					if(SpiderConstant.DEBUG){
+						System.out.println("==========抓取实时数据异常=========");
+						e.printStackTrace();
+					}
 					pw.write(new Date().toString() +  ":====抓取实时数据异常;异常信息:\n" + e.getMessage() + "\n");
+					//补抓一次
+					try{
+						realData();
+					}catch(Exception ex){
+						if(SpiderConstant.DEBUG){
+							System.out.println("==========补抓抓取实时数据异常=========");
+			        		ex.printStackTrace();
+						}
+						pw.write(new Date().toString() +  ":====补抓抓取实时数据异常;异常信息:\n" + ex.getMessage() + "\n");
+					}
 				}
 				//当天数据
 				try{
-					Map<String,String> todayParamMap = new HashMap<String, String>();
-					RequestParams todayResParam = new RequestParams("http://www.weather.com.cn/weather1d/101190202.shtml",0,todayParamMap);
-					Document todayDoc = SpiderUtil.getDocument(todayResParam,null);
-					//实时数据
-					JSONObject todayJson = skyService.getTodayData(todayDoc);
-					//System.out.println("===========实时数据=====start=======");
-					dao.addTodayData(todayJson);
-					//System.out.println("===========实时数据======end======");
+					todayData();
 				}catch(Exception e){
-					pw.write(new Date().toString() +  ":====抓取实时数据异常;异常信息\n" + e.getMessage() + "\n");
+					if(SpiderConstant.DEBUG){
+						System.out.println("==========抓取当天数据异常=========");
+		        		e.printStackTrace();
+					}
+					pw.write(new Date().toString() +  ":====抓取当天数据异常;异常信息\n" + e.getMessage() + "\n");
+					//补抓一次
+					try{
+						todayData();
+					}catch(Exception ex){
+						if(SpiderConstant.DEBUG){
+							System.out.println("==========补抓抓取当天数据异常=========");
+			        		ex.printStackTrace();
+						}
+						pw.write(new Date().toString() +  ":====补抓抓取当天数据异常;异常信息\n" + ex.getMessage() + "\n");
+					}
 				}
 				//生活指数
 				try {
-					Map<String,String> liveParamMap = new HashMap<String, String>();
-					RequestParams liveResParam = new RequestParams("http://www.weather.com.cn/weather1d/101190202.shtml",0,liveParamMap);
-					Document liveDoc = SpiderUtil.getDocument(liveResParam,null);
-					SkyService liveTimeService = new SkyServiceImpl();
-					JSONObject liveJson = liveTimeService.getLiveIndex(liveDoc);
-					//System.out.println("===========生活指数======start=====");
-					//System.out.println(liveJson);
-					dao.addLiveData(liveJson);
-					dao.addLiveData2(liveJson);
-					//System.out.println("===========生活指数======end======");
-				} catch (IOException e) {
+					liveData();
+				} catch (Exception e) {
+					if(SpiderConstant.DEBUG){
+						System.out.println("==========抓取生活指数异常=========");
+		        		e.printStackTrace();
+					}
 					pw.write(new Date().toString() +  ":====抓取生活指数异常;异常信息:\n" + e.getMessage() + "\n");
+					try{
+						liveData();
+					}catch(Exception ex){
+						if(SpiderConstant.DEBUG){
+							System.out.println("==========补抓抓取生活指数异常=========");
+			        		ex.printStackTrace();
+						}
+						pw.write(new Date().toString() +  ":====补抓抓取生活指数异常;异常信息:\n" + ex.getMessage() + "\n");
+					}
 				}
 				//7天数据
 				try {
-					Map<String,String> sevdParamMap = new HashMap<String, String>();
-					RequestParams sevdResParam = new RequestParams("http://www.weather.com.cn/weather/101190202.shtml",0,sevdParamMap);
-					Document sevdDoc = SpiderUtil.getDocument(sevdResParam,null);
-					JSONObject sevdjson = skyService.get7dData(sevdDoc);
-					//System.out.println("===========7天数据======start=====");
-					//System.out.println(sevdjson);
-					dao.add7DayData(sevdjson);
-					//System.out.println("===========7天数据======end======");
-				} catch (IOException e) {
+					day7Data();
+				} catch (Exception e) {
+					if(SpiderConstant.DEBUG){
+						System.out.println("==========抓取7天数据异常=========");
+		        		e.printStackTrace();
+					}
 					pw.write(new Date().toString() +  ":====抓取7天数据异常;异常信息:\n" + e.getMessage() + "\n");
+					//补抓一次
+					try{
+						day7Data();
+					}catch(Exception ex){
+						if(SpiderConstant.DEBUG){
+							System.out.println("==========补抓抓取7天数据异常=========");
+			        		ex.printStackTrace();
+						}
+						pw.write(new Date().toString() +  ":====补抓抓取7天数据异常;异常信息:\n" + ex.getMessage() + "\n");
+					}
 				}
 				pw.close();
 			} catch (FileNotFoundException e) {
