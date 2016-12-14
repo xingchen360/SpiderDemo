@@ -84,9 +84,7 @@ public class Task extends TimerTask{
     	SkyDao dao = new SkyDaoImpl();
     	Map<String,String> todayParamMap = new HashMap<String, String>();
 		RequestParams todayResParam = new RequestParams("http://www.weather.com.cn/weather1d/101190202.shtml",0,todayParamMap);
-		Map<String,String> realHeaderMap = new HashMap<String, String>();
-		realHeaderMap.put("Referer", "http://www.weather.com.cn/weather1d/101280601.shtml");
-		Document todayDoc = SpiderUtil.getDocument(todayResParam,realHeaderMap);
+		Document todayDoc = SpiderUtil.getDocumentByJsoupParse(todayResParam,null);
 		//实时数据
 		JSONObject todayJson = skyService.getTodayData(todayDoc);
 		dao.addTodayData(todayJson);
@@ -103,9 +101,7 @@ public class Task extends TimerTask{
     	SkyDao dao = new SkyDaoImpl();
     	Map<String,String> liveParamMap = new HashMap<String, String>();
 		RequestParams liveResParam = new RequestParams("http://www.weather.com.cn/weather1d/101190202.shtml",0,liveParamMap);
-		Map<String,String> realHeaderMap = new HashMap<String, String>();
-		realHeaderMap.put("Referer", "http://www.weather.com.cn/weather1d/101280601.shtml");
-		Document liveDoc = SpiderUtil.getDocument(liveResParam,realHeaderMap);
+		Document liveDoc = SpiderUtil.getDocumentByJsoupParse(liveResParam,null);
 		JSONObject liveJson = skyService.getLiveIndex(liveDoc);
 		//dao.addLiveData(liveJson);
 		dao.addLiveData2(liveJson);
@@ -122,9 +118,7 @@ public class Task extends TimerTask{
     	SkyDao dao = new SkyDaoImpl();
     	Map<String,String> sevdParamMap = new HashMap<String, String>();
 		RequestParams sevdResParam = new RequestParams("http://www.weather.com.cn/weather/101190202.shtml",0,sevdParamMap);
-		Map<String,String> realHeaderMap = new HashMap<String, String>();
-		realHeaderMap.put("Referer", "http://www.weather.com.cn/weather1d/101280601.shtml");
-		Document sevdDoc = SpiderUtil.getDocument(sevdResParam,realHeaderMap);
+		Document sevdDoc = SpiderUtil.getDocumentByJsoupParse(sevdResParam,null);
 		JSONObject sevdjson = skyService.get7dData(sevdDoc);
 		dao.add7DayData(sevdjson);
     }

@@ -1,6 +1,7 @@
 package com.noteshare.spider.common.util;
 
 import java.io.IOException;
+import java.net.URL;
 import java.util.Map;
 
 import org.jsoup.Connection;
@@ -46,6 +47,26 @@ public class SpiderUtil {
 				doc = conn.timeout(100000).post();
 				break;
 			}
+			return doc;
+		}else{
+			throw new SpiderException("链接路径不合法");
+		}
+	}
+	/**
+	 * @Description: 添加的一个获取doc的方法，尝试解决EOFException问题,主要是了为了可以指定编码
+	 * @param resParams
+	 * @param headerMap
+	 * @return doc ： 文档对象
+	 * @throws IOException
+	 * @author     : NoteShare
+	 * Create Date : 2016年12月14日 下午5:51:02
+	 * @throws
+	 */
+	public static Document getDocumentByJsoupParse(RequestParams resParams,Map<String,String> headerMap) throws IOException {
+		//判断请求路径是否合法
+		boolean bool = Validation.validateRule(resParams.getLink());
+		if(bool){
+			Document doc = Jsoup.parse(new URL(resParams.getLink()).openStream(), "UTF-8", resParams.getLink());
 			return doc;
 		}else{
 			throw new SpiderException("链接路径不合法");
