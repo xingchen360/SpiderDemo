@@ -23,7 +23,8 @@ public class SkyServiceImpl implements SkyService{
 		JSONObject json = new JSONObject();
 		Elements elements = SpiderUtil.getElements(SpiderConstant.IDSELECTOR, "today", doc);
 		Element todayElement = elements.get(0);
-		Element ulElement = todayElement.getElementsByTag("ul").get(0);
+		Element tDivElement = todayElement.getElementsByClass("t").get(0);
+		Element ulElement = tDivElement.getElementsByTag("ul").get(0);
 		Elements liElements = ulElement.getElementsByTag("li");
 		Element daytimeElment = liElements.get(0);
 		Element nightElement = liElements.get(1);
